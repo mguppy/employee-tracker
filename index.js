@@ -16,9 +16,10 @@ const allOptions = [
 // Function to initialize app
 function init() {
     //Get response from manager and decides which SQL query to run
-    inquirer.prompt(allOptions).then(allOptionsResponse) => {
-        if(allOptionsResponse == 'View All Departments') {
-            
+    inquirer.prompt(allOptions).then((allOptionsResponses) => {
+        if (allOptionsResponses.useroption == 'View All Departments') {
+            // Post route that returns the select all departments
+            });
         }
-    }
+    });
 };
