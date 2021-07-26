@@ -36,9 +36,16 @@ const allOptions = [
     }
 ]
 
+const addDepartment = [
+    {
+        type: "input",
+        message: "What is the name of the department you would like to add?",
+        name: "department"
+    }
+]
+
 // Function to initialize app
 function init() {
-
     askQuestion();
 };
 
@@ -60,9 +67,32 @@ function askQuestion() {
                 });
                 break;
             case "View All Employees":
-                db.query('SELECT * from employee', function (err, results){
-                console.table(results);
-                askQuestion();
+                db.query('SELECT * from employee', function (err, results) {
+                    console.table(results);
+                    askQuestion();
+                });
+                break;
+            case "Add a Department":
+                inquirer.prompt(addDepartment).then(
+                    (departmentResponse) => 
+                    {
+                        var department = departmentResponse.department;
+                        db.query(
+                            `INSERT INTO department(name)
+                            VALUES("${department}");`, function (err, results) 
+                            {
+                                if (err) 
+                                {
+                                    console.log( "error:" + err.message);
+                                    return;
+                                }
+                                else 
+                                {
+                                    console.log("success!");
+                                }
+                                askQuestion();
+                            }
+                        );
                 });
                 break;
         }
