@@ -108,6 +108,7 @@ function init() {
     db.query('SELECT CONCAT(first_name, " ", last_name) as name FROM employee WHERE manager_id is null', function (err, results) {
         var managerNames = results;
         addEmployee[3].choices = managerNames;
+        addEmployee[3].choices.push("No manager needed");
     });
 
     askQuestion();
@@ -205,28 +206,50 @@ function askQuestion() {
                         var lastName = employeeResponse.lastname;
                         var role = employeeResponse.employeerole;
                         var manager = employeeResponse.employeemanager;
-                        db.query(
-                            `SELECT id FROM employee WHERE CONCAT(first_name, " ", last_name) = "${manager}"`, function (err, results) 
-                            {
-                                var managerid = results[0].id;
-                                var query = `INSERT INTO employee(roles_id, first_name, last_name, manager_id)
-                                VALUES((SELECT id FROM roles WHERE title = "${role}"), "${firstName}", "${lastName}", ${managerid});`
-                                db.query(query, function (err, results) 
-                                    {
-                                        if (err) 
+
+                        if (manager !== "No manager needed") {
+                            db.query(
+                                `SELECT id FROM employee WHERE CONCAT(first_name, " ", last_name) = "${manager}"`, function (err, results) 
+                                {
+                                    var managerid = results[0].id;
+                                    var query = `INSERT INTO employee(roles_id, first_name, last_name, manager_id)
+                                    VALUES((SELECT id FROM roles WHERE title = "${role}"), "${firstName}", "${lastName}", ${managerid});`
+                                    db.query(query, function (err, results) 
                                         {
-                                            console.log( "error:" + err.message);
-                                            return;
+                                            if (err) 
+                                            {
+                                                console.log( "error:" + err.message);
+                                                return;
+                                            }
+                                            else 
+                                            {
+                                                console.log("success!");
+                                            }
+                                            askQuestion();
                                         }
-                                        else 
+                                    )
+                                }
+                            )
+                        }
+                        else {
+                                    var query = `INSERT INTO employee(roles_id, first_name, last_name)
+                                    VALUES((SELECT id FROM roles WHERE title = "${role}"), "${firstName}", "${lastName}");`
+                                    db.query(query, function (err, results) 
                                         {
-                                            console.log("success!");
+                                            if (err) 
+                                            {
+                                                console.log( "error:" + err.message);
+                                                return;
+                                            }
+                                            else 
+                                            {
+                                                console.log("success!");
+                                            }
+                                            askQuestion();
                                         }
-                                        askQuestion();
-                                    }
-                                )
-                            }
-                        )
+                                    )
+                        }
+                        
                     }
                 )
             break;
