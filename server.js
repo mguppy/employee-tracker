@@ -63,13 +63,40 @@ const addRole = [
     }
 ]
 
+const addEmployee = [
+    {
+        type: "input",
+        message: "What is the employee's first name?",
+        name: "firstname"
+    },
+    {
+        type: "input",
+        message: "What is the employee's last name?",
+        name: "lastname"
+    },
+    {
+        type: "list",
+        message: "What is the employee's role?",
+        name: "employeerole",
+        choices: []
+    },
+]
+
 // Function to initialize app
 function init() {
     
+    //Populate roledepartment dropdown with the values currently in the Database
     db.query('SELECT name FROM department', function (err, results) {
         var departmentNames = results;
-        console.log(departmentNames)
         addRole[2].choices = departmentNames;
+        console.log(departmentNames);
+    });
+
+    //Populate role dropdown with the values correctly in the Database
+    db.query('SELECT title as name FROM roles', function (err, results) {
+        var roleNames = results;
+        addEmployee[2].choices = roleNames;
+        console.log(addEmployee[2].choices);
     });
 
     askQuestion();
@@ -135,17 +162,13 @@ function askQuestion() {
                 inquirer.prompt(addRole).then(
                     (roleResponse) => 
                     {
-                        //Populate roledepartment dropdown with the values currently in the Database
-                        //Select name from department 
-                        // var departmentNames = db.query(`SELECT name FROM department`);
-
                         //Insert new role with name, salary and departments input by the user into database
                         var name = roleResponse.role;
                         var salary = roleResponse.salary;
                         var department = roleResponse.department;
                         db.query(
-                            `INSERT INTO roles(department, name, salary)
-                            VALUES(${department},"${name}","${salary});`, function (err, results) 
+                            `INSERT INTO roles(department_id, title, salary)
+                            VALUES((SELECT id FROM department WHERE name = "${department}"), "${name}", "${salary}");`, function (err, results) 
                             {
                                 if (err) 
                                 {
@@ -161,6 +184,35 @@ function askQuestion() {
                         )
                     }
                 )
+            break;
+            case "Add an Employee":
+                console.log(addEmployee[2].choices);
+                inquirer.prompt(addEmployee).then(
+                    (employeeResponse) => 
+                    {
+                        //Insert new employee with firstname, lastname, role
+                        var firstName = employeeResponse.firstname;
+                        var lastName = employeeResponse.lastname;
+                        var role = employeeResponse.employeerole;
+                        // db.query(
+                        //     `INSERT INTO roles(department_id, title, salary)
+                        //     VALUES((SELECT id FROM department WHERE name = "${department}"), "${name}", "${salary}");`, function (err, results) 
+                        //     {
+                        //         if (err) 
+                        //         {
+                        //             console.log( "error:" + err.message);
+                        //             return;
+                        //         }
+                        //         else 
+                        //         {
+                        //             console.log("success!");
+                        //         }
+                        //         askQuestion();
+                        //     }
+                        // )
+                    }
+                )
+            break;
         }
     });
 }
