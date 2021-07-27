@@ -21,7 +21,8 @@ const db = mysql.createConnection(
         user: 'root',
         // MySQL password
         password: 'password',
-        database: 'employees_db'
+        database: 'employees_db',
+        multipleStatements: true
     },
     console.log(`Connected to the employees_db database.`)
 );
@@ -203,21 +204,27 @@ function askQuestion() {
                         var firstName = employeeResponse.firstname;
                         var lastName = employeeResponse.lastname;
                         var role = employeeResponse.employeerole;
-                        var manager = employeeResponse.manager;
+                        var manager = employeeResponse.employeemanager;
                         db.query(
-                            `INSERT INTO employee(roles_id, first_name, last_name)
-                            VALUES((SELECT id FROM roles WHERE title = "${role}"), "${firstName}", "${lastName}");`, function (err, results) 
+                            `SELECT id FROM employee WHERE CONCAT(first_name, " ", last_name) = "${manager}"`, function (err, results) 
                             {
-                                if (err) 
-                                {
-                                    console.log( "error:" + err.message);
-                                    return;
-                                }
-                                else 
-                                {
-                                    console.log("success!");
-                                }
-                                askQuestion();
+                                var managerid = results[0].id;
+                                var query = `INSERT INTO employee(roles_id, first_name, last_name, manager_id)
+                                VALUES((SELECT id FROM roles WHERE title = "${role}"), "${firstName}", "${lastName}", ${managerid});`
+                                db.query(query, function (err, results) 
+                                    {
+                                        if (err) 
+                                        {
+                                            console.log( "error:" + err.message);
+                                            return;
+                                        }
+                                        else 
+                                        {
+                                            console.log("success!");
+                                        }
+                                        askQuestion();
+                                    }
+                                )
                             }
                         )
                     }
