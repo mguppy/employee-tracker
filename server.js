@@ -80,6 +80,12 @@ const addEmployee = [
         name: "employeerole",
         choices: []
     },
+    {
+        type: "list",
+        message: "Who is the employee's manager?",
+        name: "employeemanager",
+        choices: []
+    }
 ]
 
 // Function to initialize app
@@ -95,6 +101,12 @@ function init() {
     db.query('SELECT title as name FROM roles', function (err, results) {
         var roleNames = results;
         addEmployee[2].choices = roleNames;
+    });
+
+    //Populate manager dropdown with the managers in the employees table
+    db.query('SELECT CONCAT(first_name, " ", last_name) as name FROM employee WHERE manager_id is null', function (err, results) {
+        var managerNames = results;
+        addEmployee[3].choices = managerNames;
     });
 
     askQuestion();
@@ -191,6 +203,7 @@ function askQuestion() {
                         var firstName = employeeResponse.firstname;
                         var lastName = employeeResponse.lastname;
                         var role = employeeResponse.employeerole;
+                        var manager = employeeResponse.manager;
                         db.query(
                             `INSERT INTO employee(roles_id, first_name, last_name)
                             VALUES((SELECT id FROM roles WHERE title = "${role}"), "${firstName}", "${lastName}");`, function (err, results) 
