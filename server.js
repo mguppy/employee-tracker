@@ -44,8 +44,34 @@ const addDepartment = [
     }
 ]
 
+const addRole = [
+    {
+        type: "input",
+        message: "What is the name of the role you would like to add?",
+        name: "role"
+    },
+    {
+        type: "input",
+        message: "What is the salary for this role?",
+        name: "salary"
+    },
+    {
+        type: "list",
+        message: "Which department does the role belong to?",
+        name: "department",
+        choices: []
+    }
+]
+
 // Function to initialize app
 function init() {
+    
+    db.query('SELECT name FROM department', function (err, results) {
+        var departmentNames = results;
+        console.log(departmentNames)
+        addRole[2].choices = departmentNames;
+    });
+
     askQuestion();
 };
 
@@ -78,8 +104,48 @@ function askQuestion() {
                     {
                         var department = departmentResponse.department;
                         db.query(
-                            `INSERT INTO department(name)
-                            VALUES("${department}");`, function (err, results) 
+                            `SELECT COUNT(*) FROM department WHERE name = "${department}";`, function (err, results){
+                                console.log(results)
+                                if(results == 0) {
+                                    db.query(
+                                        `INSERT INTO department(name)
+                                        VALUES("${department}");`, function (err, results) 
+                                        {
+                                            if (err) 
+                                            {
+                                                console.log( "error:" + err.message);
+                                                return;
+                                            }
+                                            else 
+                                            {
+                                                console.log("success!");
+                                            }
+                                            askQuestion();
+                                        }
+                                    );
+                                }
+                                else {
+                                    console.log("department already exists.")
+                                    askQuestion();
+                                }
+                            });
+                });
+                break;
+            case "Add a Role":
+                inquirer.prompt(addRole).then(
+                    (roleResponse) => 
+                    {
+                        //Populate roledepartment dropdown with the values currently in the Database
+                        //Select name from department 
+                        // var departmentNames = db.query(`SELECT name FROM department`);
+
+                        //Insert new role with name, salary and departments input by the user into database
+                        var name = roleResponse.role;
+                        var salary = roleResponse.salary;
+                        var department = roleResponse.department;
+                        db.query(
+                            `INSERT INTO roles(department, name, salary)
+                            VALUES(${department},"${name}","${salary});`, function (err, results) 
                             {
                                 if (err) 
                                 {
@@ -92,9 +158,9 @@ function askQuestion() {
                                 }
                                 askQuestion();
                             }
-                        );
-                });
-                break;
+                        )
+                    }
+                )
         }
     });
 }
