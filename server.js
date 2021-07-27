@@ -89,14 +89,12 @@ function init() {
     db.query('SELECT name FROM department', function (err, results) {
         var departmentNames = results;
         addRole[2].choices = departmentNames;
-        console.log(departmentNames);
     });
 
     //Populate role dropdown with the values correctly in the Database
     db.query('SELECT title as name FROM roles', function (err, results) {
         var roleNames = results;
         addEmployee[2].choices = roleNames;
-        console.log(addEmployee[2].choices);
     });
 
     askQuestion();
@@ -186,7 +184,6 @@ function askQuestion() {
                 )
             break;
             case "Add an Employee":
-                console.log(addEmployee[2].choices);
                 inquirer.prompt(addEmployee).then(
                     (employeeResponse) => 
                     {
@@ -194,22 +191,22 @@ function askQuestion() {
                         var firstName = employeeResponse.firstname;
                         var lastName = employeeResponse.lastname;
                         var role = employeeResponse.employeerole;
-                        // db.query(
-                        //     `INSERT INTO roles(department_id, title, salary)
-                        //     VALUES((SELECT id FROM department WHERE name = "${department}"), "${name}", "${salary}");`, function (err, results) 
-                        //     {
-                        //         if (err) 
-                        //         {
-                        //             console.log( "error:" + err.message);
-                        //             return;
-                        //         }
-                        //         else 
-                        //         {
-                        //             console.log("success!");
-                        //         }
-                        //         askQuestion();
-                        //     }
-                        // )
+                        db.query(
+                            `INSERT INTO employee(roles_id, first_name, last_name)
+                            VALUES((SELECT id FROM roles WHERE title = "${role}"), "${firstName}", "${lastName}");`, function (err, results) 
+                            {
+                                if (err) 
+                                {
+                                    console.log( "error:" + err.message);
+                                    return;
+                                }
+                                else 
+                                {
+                                    console.log("success!");
+                                }
+                                askQuestion();
+                            }
+                        )
                     }
                 )
             break;
