@@ -89,6 +89,21 @@ const addEmployee = [
     }
 ]
 
+const updateRole = [
+    {
+        type: "list",
+        message: "Which employee would you like to update?",
+        name: "employeeupdate",
+        choices: []
+    },
+    {
+        type: "list",
+        message: "Which role did you want to assign to them?",
+        name: "employeeroleupdate",
+        choices: []
+    }
+]
+
 // Function to initialize app
 function init() {
     
@@ -102,6 +117,7 @@ function init() {
     db.query('SELECT title as name FROM roles', function (err, results) {
         var roleNames = results;
         addEmployee[2].choices = roleNames;
+        updateRole[1].choices = roleNames;
     });
 
     //Populate manager dropdown with the managers in the employees table
@@ -109,6 +125,12 @@ function init() {
         var managerNames = results;
         addEmployee[3].choices = managerNames;
         addEmployee[3].choices.push("No manager needed");
+    });
+
+    //Populate employee dropdown with all employees in employees table
+    db.query('SELECT CONCAT(first_name, " ", last_name) as name FROM employee', function (err, results) {
+        var employeeNames = results;
+        updateRole[0].choices = employeeNames;
     });
 
     askQuestion();
@@ -250,6 +272,32 @@ function askQuestion() {
                                     )
                         }
                         
+                    }
+                )
+            break;
+            case "Update an Employee Role":
+                inquirer.prompt(updateRole).then(
+                    (updateroleResponse) => 
+                    {
+                        //Update role for employee selected
+                        var employee = updateroleResponse.employeeupdate;
+                        var role = updateroleResponse.employeeroleupdate;
+                        db.query(
+                            `INSERT INTO roles(department_id, title, salary)
+                            VALUES((SELECT id FROM department WHERE name = "${department}"), "${name}", "${salary}");`, function (err, results) 
+                            {
+                                if (err) 
+                                {
+                                    console.log( "error:" + err.message);
+                                    return;
+                                }
+                                else 
+                                {
+                                    console.log("success!");
+                                }
+                                askQuestion();
+                            }
+                        )
                     }
                 )
             break;
