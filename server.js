@@ -159,39 +159,29 @@ function askQuestion() {
                     askQuestion();
                 });
                 break;
-            case "Add a Department":
-                inquirer.prompt(addDepartment).then(
-                    (departmentResponse) => 
-                    {
-                        var department = departmentResponse.department;
-                        db.query(
-                            `SELECT COUNT(*) FROM department WHERE name = "${department}";`, function (err, results){
-                                console.log(results)
-                                if(results == 0) {
-                                    db.query(
-                                        `INSERT INTO department(name)
-                                        VALUES("${department}");`, function (err, results) 
-                                        {
-                                            if (err) 
-                                            {
-                                                console.log( "error:" + err.message);
-                                                return;
-                                            }
-                                            else 
-                                            {
-                                                console.log("success!");
-                                            }
-                                            askQuestion();
-                                        }
-                                    );
-                                }
-                                else {
-                                    console.log("department already exists.")
+                case "Add a Department":
+                    inquirer.prompt(addDepartment).then(
+                        (departmentResponse) => 
+                        {
+                            var department = departmentResponse.department;
+                            db.query(
+                                `INSERT INTO department(name)
+                                VALUES("${department}");`, function (err, results) 
+                                {
+                                    if (err) 
+                                    {
+                                        console.log( "error:" + err.message);
+                                        return;
+                                    }
+                                    else 
+                                    {
+                                        console.log("success!");
+                                    }
                                     askQuestion();
                                 }
-                            });
-                });
-                break;
+                            );
+                    });
+                    break;
             case "Add a Role":
                 inquirer.prompt(addRole).then(
                     (roleResponse) => 
