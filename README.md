@@ -24,6 +24,9 @@ THEN I am prompted to select an employee to update and their new role and this i
 # Description
 This is a command line application that accepts user input and then queries the database based on what the user searched for as well as updates the database.
 
+# Demo of Employee Tracker
+![Alt Text](Demo.gif)
+
 # Questions
 If you have any questions about the repo, open an issue or contact me directly at mguppy34@gmail.com. You can find more of my work at github.com/mguppy.
 
