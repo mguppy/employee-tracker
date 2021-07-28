@@ -93,13 +93,13 @@ const updateRole = [
     {
         type: "list",
         message: "Which employee would you like to update?",
-        name: "employeeupdate",
+        name: "employeeUpdate",
         choices: []
     },
     {
         type: "list",
         message: "Which role did you want to assign to them?",
-        name: "employeeroleupdate",
+        name: "employeeRoleUpdate",
         choices: []
     }
 ]
@@ -280,11 +280,12 @@ function askQuestion() {
                     (updateroleResponse) => 
                     {
                         //Update role for employee selected
-                        var employee = updateroleResponse.employeeupdate;
-                        var role = updateroleResponse.employeeroleupdate;
+                        var employee = updateroleResponse.employeeUpdate;
+                        var role = updateroleResponse.employeeRoleUpdate;
                         db.query(
-                            `INSERT INTO roles(department_id, title, salary)
-                            VALUES((SELECT id FROM department WHERE name = "${department}"), "${name}", "${salary}");`, function (err, results) 
+                            `UPDATE employee
+                            SET roles_id = (SELECT id FROM roles WHERE title = "${role}")
+                            WHERE CONCAT(first_name, " ", last_name) = "${employee}"`, function (err, results) 
                             {
                                 if (err) 
                                 {
